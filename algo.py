@@ -23,6 +23,7 @@ def k_nearest_neighbors(person, k):
     else:
       distance = calc_distance(person['preferences'], user['preferences'])
       d[user['id']] = distance
+
   return sorted(d.items(), key=lambda x: x[1])[0:k]
 
 
