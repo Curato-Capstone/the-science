@@ -16,6 +16,9 @@ for business in all_businesses:
     temp_set.add(business['business_id'])
   elif random.randint(0,20) < 4:
     temp_set2.add(business['business_id'])
+  if business['name'] == 'Test':
+    temp_set2.add(business['business_id'])
+    temp_set.add(business['business_id'])
 
 person1 = {
   'id': 4,
