@@ -2,23 +2,65 @@
 
 Here's how to science!
 
-## server.py
-Microservices for all.
+### Installing dependencies
+You won't have any, I'm dealing with it.
 
-*GET /suggestions*
+## Microservice API Calls (server.py)
+**_GET /suggestions_**
 
-__params__
-- q
-  * Query string that a user searches on
-  * String
+Function:
 
-- user_id
-  * **required**
-  * User ID value to find suggestions for
-  * String (UUID, probably)
+Get some sweet, sweet suggestions.
 
-## algo.py
+Query params:
+```yaml
+  {
+    user_id: (String, required) user's uuid,
+    q: (String, optional) query term to earch on,
+    num_sugg: (String or int, optional) number of suggestions you want back
+  }
+```
 
-*find_user_by_id(user_id)*
-Finds user by their ID
+Response body (200):
 
+An array of JSON objects, that looks like this:
+
+```yaml
+  {
+    "allowMenuUrlEdit": (Boolean), not relevant to user,
+    "categories": (Array of JSON objects) some stuff in them that the client doesn't need to see
+     "contact": {
+        "formattedPhone": (String) formatted like so: "(xxx) xxx-xxxx",
+        "phone": (String) another phone number format: "xxxxxxxxxxx"
+     },
+     "hereNow": (JSON object) if we used Foursquare accounts this would matter,
+     "id": (String) venue id,
+     "location": {
+        "address": (String) street address,
+        "cc": (String) country code,
+        "city": (String) city name,
+        "country": (String) country name,
+        "distance": (Int, probably) distance from given coords in meters,
+        "formattedAddress": (Array of strings) streed address, city/state/zip, country,
+        "lat": (Float) lat,
+        "lng": (Float) long,
+        "postalCode": (String) zipcode,
+        "state": (String) state name abbreviation
+     },
+     "name": (String) name of business/point of interest,
+     "referralId": (String) meh,
+     "specials": (Object) also meh,
+     "stats": (Object) some info about people who have left tips or checked in here,
+     "url": (String) url for the place,
+     "venueChains": (Array of strings) venue id's for other stores in the chain,
+     "verified": (Boolean) are you real or are you fake?
+  }
+```
+
+Response (400):
+
+```
+{
+  message: (String) reminds you to send the user id
+}
+```
