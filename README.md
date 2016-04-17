@@ -23,7 +23,7 @@ Query params:
 
 Response body (200):
 
-An array of JSON objects, that looks like this:
+An array of JSON objects from Foursquare, that looks like this:
 
 ```yaml
   {
@@ -64,3 +64,6 @@ Response (400):
   message: (String) reminds you to send the user id
 }
 ```
+
+
+Thanks Foursquare, we love your API dawg
