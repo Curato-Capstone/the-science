@@ -4,23 +4,29 @@ import algo
 
 app = Flask(__name__)
 
-@app.route('/suggestions')
+@app.route('/suggestions', methods=["GET", "POST"])
 def suggestion_route():
-    query = request.args.get('q')
-    user_id = request.args.get('user_id')
-    num_places = request.args.get('num_sugg')
 
-    if user_id is None:
-      return flask.abort(400)
-    elif query is None:
-      query = ""
+    if request.method == "GET":
+      query = request.args.get('q')
+      user_id = request.args.get('user_id')
+      num_places = request.args.get('num_sugg')
 
-    if num_places is None:
-      num_places = 10
+      if user_id is None:
+        return flask.abort(400)
+      elif query is None:
+        query = ""
+
+      if num_places is None:
+        num_places = 10
+      else:
+        num_places = int(num_places)
+
+      sugg = algo.get_suggestions(user_id, num_places, 3, query)
+
     else:
-      num_places = int(num_places)
-
-    sugg = algo.get_suggestions(user_id, num_places, 3, query)
+      prefs = flask.json.loads(request.form['preferences'])
+      sugg = algo.get_new_user_suggestions(prefs, 10, 3, "")
 
     return Response(flask.json.dumps(sugg),  mimetype='application/json')
 
