@@ -65,5 +65,22 @@ Response (400):
 }
 ```
 
+**_POST /suggestions_**
+
+Function:
+
+Get suggestions in the absense of a user ID
+
+Request body:
+```yaml
+  {
+    preferences: (PROPERLY FORMATTED JSON OBJECT) user preferences
+  }
+```
+
+Response body:
+
+Same as above.
+
 
 Thanks Foursquare, we love your API dawg
