@@ -71,7 +71,7 @@ def find_venue_by_foursquare(venue_id):
 
   venue_images = json.load(venue_json)['response']['photos']
   if 'items' in venue_images.keys():
-    if len(venue_images['items'] > 0):
+    if len(venue_images['items']) > 0:
       image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
       venue_details['image'] = image
     else:
