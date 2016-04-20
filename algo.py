@@ -70,7 +70,7 @@ def find_venue_by_foursquare(venue_id):
   venue_json = urllib2.urlopen(image_url)
 
   venue_images = json.load(venue_json)['response']['photos']
-  image = venue_images[0]['prefix'] + "original" + venue_images[0]['suffix']
+  image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
   venue_details['image'] = image
 
   for detail in venue_details.keys():
