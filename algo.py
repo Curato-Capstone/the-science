@@ -65,9 +65,18 @@ def find_venue_by_foursquare(venue_id):
           "&client_secret=" + FOURSQUARE_CLIENT['CLIENT_SECRET'] + "&v=20130815"
   venue_details = json.load(urllib2.urlopen(venue))['response']['venue']
 
+  image_url = "https://api.foursquare.com/v2/venues/" + venue_id + "/photos?client_id=" + FOURSQUARE_CLIENT['CLIENT_ID'] \
+              + "&client_secret=" + FOURSQUARE_CLIENT['CLIENT_SECRET'] + "&v=20130815"
+  venue_json = urllib2.urlopen(image_url)
+
+  venue_images = json.load(venue_json)['response']['photos']
+  image = venue_images[0]['prefix'] + "original" + venue_images[0]['suffix']
+  venue_details['image'] = image
+
   for detail in venue_details.keys():
     if detail not in KEEP_ATTRS:
       del venue_details[detail]
+
   rd.set(venue_details['id'], json.dumps(venue_details))
   return venue_details
 
