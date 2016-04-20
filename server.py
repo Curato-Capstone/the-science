@@ -5,6 +5,7 @@ import algo
 app = Flask(__name__)
 
 @app.route('/suggestions', methods=["GET", "POST"])
+
 def suggestion_route():
 
     if request.method == "GET":
@@ -30,7 +31,9 @@ def suggestion_route():
         return flask.abort(400)
       sugg = algo.get_new_user_suggestions(prefs, 10, 3, "")
 
-    return Response(flask.json.dumps(sugg),  mimetype='application/json')
+    resp = Response(flask.json.dumps(sugg),  mimetype='application/json')
+    resp.headers["Access-Control-Allow-Origin"] = '*'
+    return resp
 
 @app.route('/')
 def main_route():
