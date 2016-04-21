@@ -111,7 +111,7 @@ def calc_distance(pref1, pref2):
   sum = 0
   for pref in pref1:
     sum += (pref1[pref] - pref2[pref]) ** 2
-  return math.pow(sum, 1.0/len(pref))
+  return math.pow(sum, 1.0/len(pref1))
 
 # Choose some random suggestions based on the neighbors and optional query string
 def choose_suggestions(main_user, neighbors, num_sugg, query=""):
