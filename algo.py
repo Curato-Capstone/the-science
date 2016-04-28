@@ -11,7 +11,7 @@ TAXONOMY = {
   "culture": ["art", "museum", "history", "landmark"],
   "sports": [],
   "price": [],
-  "food": ["restaurant", "food"],
+  "food": ["restaurant", "food", "breakfast", "lunch", "dinner"],
   "entertainment": [],
   "relaxation": [],
   "shopping": []
@@ -92,7 +92,6 @@ def find_venue_by_foursquare(venue_id):
 def get_cached_businesses():
   return rd.keys()
 
-# TODO: make this not crappy
 def k_nearest_neighbors(person, k):
   d = dict()
   for user in get_all_users():
@@ -122,7 +121,9 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
   # Store all items favorited by neighbors
   for neighbor in neighbors:
     user = find_user_by_id(neighbor[0])
-    temp_set.update(set(user['favorites']))
+    for item in user['favorites']:
+      if item not in main_user['dislikes']:
+        temp_set.add(item)
 
   # For all items, get business info and add to the final set of businesses if it:
   # has the query term in the tags or the name, else just add it anyways.
@@ -156,7 +157,6 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
 
   # Update the query set with the cached businesses, or updated it again with an API call
   if query and diff > 0:
-
     query_set.update(filter_suggestions(main_user, get_cached_businesses(), query))
 
     if num_sugg - len(query_set) > 0:
@@ -180,30 +180,55 @@ def filter_suggestions(main_user, suggestions, query):
   # places that people might like based off taxonomy
   for suggestion in suggestions:
     buss = find_business_by_id(suggestion)
+    if buss['id'] not in main_user['dislikes']:
+      # Filter out suggestions if they are something that the user isn't interested in
 
-    # Filter out suggestions if they are something that the user isn't interested in
-    for pref in good_prefs:
       if 'tags' in buss.keys():
         tags = buss['tags']
-        for word in TAXONOMY[pref]:
-          if any(word in tag for tag in tags):
-            filtered.add(suggestion)
-          if query and any(query in tag for tag in tags):
-            filtered.add(suggestion)
+        if query and any(query in tag for tag in tags):
+          filtered.add(suggestion)
+        else:
+          for pref in good_prefs:
+            for word in TAXONOMY[pref]:
+              if any(word in tag for tag in tags):
+                filtered.add(suggestion)
       else:
-        for word in TAXONOMY[pref]:
-          if word in buss['name'].lower():
-            filtered.add(suggestion)
-          elif query and query in buss['name'].lower():
-            filtered.add(suggestion)
-          elif any(word in cat['name'] for cat in buss['categories']):
-            filtered.add(suggestion)
-          elif query and any(query in cat['name'] for cat in buss['categories']):
-            filtered.add(suggestion)
+        if query and query in buss['name'].lower():
+          filtered.add(suggestion)
+        elif query and any(query in cat['name'] for cat in buss['categories']):
+          filtered.add(suggestion)
+        else:
+          for pref in good_prefs:
+            for word in TAXONOMY[pref]:
+              if any(word in cat['name'] for cat in buss['categories']):
+                filtered.add(suggestion)
+              elif word in buss['name'].lower():
+                filtered.add(suggestion)
+
+  if query != "":
+    parent_name = find_preference_on_search(query)
+    final_filter = set()
+    print len(filtered)
+    for item in filtered:
+      buss = find_business_by_id(item)
+      for val in TAXONOMY[parent_name]:
+        keep = val in buss['name'].lower()
+        for category in buss['categories']:
+          keep = keep or val in category['name']
+        if 'tags' in buss.keys():
+          keep = keep or any(val in tag for tag in buss['tags'])
+        if keep:
+          final_filter.add(item)
+    filtered = final_filter
 
   return filtered
 
 
+def find_preference_on_search(query):
+  for item in TAXONOMY:
+    if query in TAXONOMY[item]:
+      return item
+  return "not found"
 # Get a user's preferences that are equal to or higher than a five
 def get_good_prefs(user):
   good_prefs = set()
@@ -252,7 +277,6 @@ def get_suggestions_by_preferences(user):
 
 # Find businesses with foursquare based on the query term and return them
 def get_suggestions_by_query(query):
-  print "ping"
   all_items = []
   all_ids = []
   url = "https://api.foursquare.com/v2/venues/search?client_id=" + \
@@ -272,10 +296,12 @@ def get_suggestions(user_id, num_sugg, k_num, query):
   user = find_user_by_id(user_id)
   neighbors = k_nearest_neighbors(user, k_num)
   suggestions = choose_suggestions(user, neighbors, num_sugg, query)
-  things = []
+  returned = []
   for sugg in suggestions:
-    things.append(find_business_by_id(sugg))
-  return things
+    returned.append(find_business_by_id(sugg))
+  if query == "":
+    returned = sorted(returned, key=lambda k: k['stats'].get('checkinsCount'), reverse=True)
+  return returned
 
 def get_new_user_suggestions(preferences, num_sugg, k_num, query):
   user = {
