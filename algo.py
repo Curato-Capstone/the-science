@@ -20,7 +20,8 @@ TAXONOMY = {
 FOURSQUARE_CLIENT = ""
 RETHINK_HOST = ""
 REDIS_HOST = ""
-KEEP_ATTRS = ['id', 'name', 'contact', 'location', 'categories', 'url', 'hours', 'rating', 'description', 'tags', 'image']
+KEEP_ATTRS = ['id', 'name', 'contact', 'location', 'categories', 'url', 'hours', 'rating', 'description', 'tags',
+              'imate', 'stats']
 
 with open("secret/foursquare.json") as json_file:
   FOURSQUARE_CLIENT = json.load(json_file)
@@ -31,10 +32,9 @@ with open("secret/connections.json") as json_file:
 
 '''
 Here are some connections
-#rd = redis.StrictRedis(host=REDIS_HOST, port=6379, db=0)
 '''
 conn = r.connect(RETHINK_HOST, 28015, db="curato").repl()
-rd = redis.StrictRedis(host="localhost",port=6379, db=0)
+rd = redis.StrictRedis(host=REDIS_HOST,port=6379, db=1)
 
 
 # Find and return a user by their ID
@@ -75,10 +75,10 @@ def find_venue_by_foursquare(venue_id):
       image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
       venue_details['image'] = image
     else:
-      image = "http://imgur.com/laeYgMM"
+      image = "http://imgur.com/laeYgMM.jpg"
       venue_details['image'] = image
   else:
-    image = "http://imgur.com/laeYgMM"
+    image = "http://imgur.com/laeYgMM.jpg"
     venue_details['image'] = image
 
   for detail in venue_details.keys():
@@ -263,10 +263,10 @@ def get_suggestions_by_preferences(user):
           image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
           venue['image'] = image
         else:
-          image = "http://imgur.com/laeYgMM"
+          image = "http://imgur.com/laeYgMM.jpg"
           venue['image'] = image
       else:
-        image = "http://imgur.com/laeYgMM"
+        image = "http://imgur.com/laeYgMM.jpg"
         venue['image'] = image
 
       all_items.append(venue)
