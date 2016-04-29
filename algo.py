@@ -208,7 +208,6 @@ def filter_suggestions(main_user, suggestions, query):
   if query != "":
     parent_name = find_preference_on_search(query)
     final_filter = set()
-    print len(filtered)
     for item in filtered:
       buss = find_business_by_id(item)
       for val in TAXONOMY[parent_name]:
