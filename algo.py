@@ -157,13 +157,12 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
 
   # Update the query set with the cached businesses, or updated it again with an API call
   if query and diff > 0:
-    query_set.update(filter_suggestions(main_user, get_cached_businesses(), query))
+    query_result = get_suggestions_by_query(query)
+    new_suggs = random.sample(query_result, diff if diff < len(query_result) else len(query_result))
+    for item in new_suggs:
+      query_set.add(item)
 
-    if num_sugg - len(query_set) > 0:
-      query_result = get_suggestions_by_query(query)
-      new_suggs = random.sample(query_result, diff if diff < len(query_result) else len(query_result))
-      for item in new_suggs:
-        query_set.add(item)
+    query_set.update(filter_suggestions(main_user, get_cached_businesses(), query))
 
     return random.sample(query_set, num_sugg if num_sugg - len(query_set) <= 0 else len(query_set))
   elif query:
