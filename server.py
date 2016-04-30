@@ -1,11 +1,11 @@
 from flask import Flask, Response, request
 import flask
 import algo
+import json
 
 app = Flask(__name__)
 
-@app.route('/suggestions', methods=["GET", "POST"])
-
+@app.route('/suggestions', methods=["GET", "POST"]
 def suggestion_route():
 
     if request.method == "GET":
@@ -38,6 +38,19 @@ def suggestion_route():
 @app.route('/')
 def main_route():
   return "You aren't supposed to be here."
+
+@app.route('/business-info', methods=["POST"])
+def business_route():
+  businesses = flask.json.loads(request.form['favorites'])
+
+  details = []
+  for business in businesses:
+    item = algo.find_business_by_id(business)
+    details.append(item)
+
+  resp = Response(flask.json.dumps(details), mimetype='application/json')
+  resp.headers["Access-Control-Allow-Origin"] = '*'
+  return resp
 
 @app.errorhandler(400)
 def invalid_request(e):
