@@ -5,9 +5,8 @@ import json
 
 app = Flask(__name__)
 
-@app.route('/suggestions', methods=["GET", "POST"]
+@app.route('/suggestions', methods=["GET", "POST"])
 def suggestion_route():
-
     if request.method == "GET":
       query = request.args.get('q')
       user_id = request.args.get('user_id')
