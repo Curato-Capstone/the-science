@@ -134,9 +134,11 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
         if not any(query in tag for tag in bus['tags']):
           continue
         elif query in bus['name'].lower():
+          print "yay"
           final_set.add(suggestion)
   else:
     final_set = temp_set
+
 
   # Initial filter of suggestions based on user preferences
   final_set = filter_suggestions(main_user, final_set, query)
@@ -154,7 +156,6 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
       final_set.update(more_results)
 
   diff = num_sugg - len(query_set)
-
   # Update the query set with the cached businesses, or updated it again with an API call
   if query and diff > 0:
     query_result = get_suggestions_by_query(query)
@@ -206,6 +207,7 @@ def filter_suggestions(main_user, suggestions, query):
 
   if query != "":
     parent_name = find_preference_on_search(query)
+    final_filter = set()
 
     if parent_name is not None:
       final_filter = set()
@@ -217,6 +219,17 @@ def filter_suggestions(main_user, suggestions, query):
             keep = keep or val in category['name']
           if 'tags' in buss.keys():
             keep = keep or any(val in tag for tag in buss['tags'])
+          if keep:
+            final_filter.add(item)
+      filtered = final_filter
+    else:
+      for item in filtered:
+        buss = find_business_by_id(item)
+        keep = query in buss['name'].lower()
+        for category in buss['categories']:
+          keep = keep or query in category['name']
+          if 'tags' in buss.keys():
+            keep = keep or any(query in tag for tag in buss['tags'])
           if keep:
             final_filter.add(item)
       filtered = final_filter
