@@ -86,12 +86,7 @@ def find_venue_by_foursquare(venue_id):
 
 # Grab all keys for cached businesses
 def get_cached_businesses():
-  global TEMP_CACHE
-  if TEMP_CACHE is None:
-    TEMP_CACHE = rd.keys()
-    return TEMP_CACHE
-  else:
-    return TEMP_CACHE
+  return rd.keys()
 
 
 def k_nearest_neighbors(person, k):
