@@ -55,10 +55,11 @@ def find_business_by_id(bid):
   for key in cache_keys:
     business = rd.get(key)
     business = json.loads(business)
-
+    print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"
     if business['id'] == bid:
       return business
-  print "Time taken to find a business:" + str(round(time.time() - time_1, 2)) + " seconds"
+  print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"
+
   return find_venue_by_foursquare(bid)
 
 # Find and cache a venue by it's venue id
@@ -235,7 +236,7 @@ def filter_suggestions(main_user, suggestions, query):
           if keep:
             final_filter.add(item)
       filtered = final_filter
-  print "Time taken to filter" + str(round(time.time() - time_1, 2)) + " seconds"
+  print "Time taken to filter: " + str(round(time.time() - time_1, 2)) + " seconds"
   return filtered
 
 
