@@ -4,7 +4,6 @@ import rethinkdb as r
 import urllib2
 import json
 import random
-import time
 
 # Basic test taxonomy to help remove items from suggestions
 TAXONOMY = {
@@ -37,8 +36,6 @@ Here are some connections
 conn = r.connect(RETHINK_HOST, 28015, db="curato").repl()
 rd = redis.StrictRedis(host=REDIS_HOST,port=6379, db=1)
 
-TEMP_CACHE = None
-
 # Find and return a user by their ID
 def find_user_by_id(id):
   user = r.table("users").get(id).run(conn)
@@ -51,18 +48,11 @@ def get_all_users():
 
 # Find a business by it's business id and return it
 def find_business_by_id(bid):
-  time_1 = time.time()
-  return json.loads(rd.get(bid))
-  '''cache_keys = get_cached_businesses()
-  for key in cache_keys:
-    business = rd.get(key)
-    business = json.loads(business)
-    if business['id'] == bid:
-      print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"
-      return business
-  print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"'''
-
-  return find_venue_by_foursquare(bid)
+  item = rd.get(bid)
+  if item is not None:
+    return json.loads(item)
+  else:
+    return find_venue_by_foursquare(bid)
 
 # Find and cache a venue by it's venue id
 def find_venue_by_foursquare(venue_id):
@@ -168,7 +158,6 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
   diff = num_sugg - len(query_set)
   # Update the query set with the cached businesses, or updated it again with an API call
   if query and diff > 0:
-    time_1 = time.time()
     query_result = get_suggestions_by_query(query)
     new_suggs = random.sample(query_result, diff if diff < len(query_result) else len(query_result))
     for item in new_suggs:
@@ -183,7 +172,6 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
 
 # Filters suggestions by a user's preferences and returns it
 def filter_suggestions(main_user, suggestions, query):
-  time_1 = time.time()
   good_prefs = get_good_prefs(main_user)
   filtered = set()
 
@@ -244,7 +232,6 @@ def filter_suggestions(main_user, suggestions, query):
           if keep:
             final_filter.add(item)
       filtered = final_filter
-  print "Time taken to filter: " + str(round(time.time() - time_1, 2)) + " seconds"
   return filtered
 
 
