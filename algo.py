@@ -37,6 +37,7 @@ Here are some connections
 conn = r.connect(RETHINK_HOST, 28015, db="curato").repl()
 rd = redis.StrictRedis(host=REDIS_HOST,port=6379, db=1)
 
+TEMP_CACHE = None
 
 # Find and return a user by their ID
 def find_user_by_id(id):
@@ -94,7 +95,12 @@ def find_venue_by_foursquare(venue_id):
 
 # Grab all keys for cached businesses
 def get_cached_businesses():
-  return rd.keys()
+  global TEMP_CACHE
+  if TEMP_CACHE is None:
+    TEMP_CACHE = rd.keys()
+  else:
+    return TEMP_CACHE
+
 
 def k_nearest_neighbors(person, k):
   d = dict()
