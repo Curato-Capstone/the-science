@@ -55,8 +55,8 @@ def find_business_by_id(bid):
   for key in cache_keys:
     business = rd.get(key)
     business = json.loads(business)
-    print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"
     if business['id'] == bid:
+      print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"
       return business
   print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"
 
