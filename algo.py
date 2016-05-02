@@ -52,7 +52,7 @@ def get_all_users():
 # Find a business by it's business id and return it
 def find_business_by_id(bid):
   time_1 = time.time()
-  return rd.get(bid)
+  return json.loads(rd.get(bid))
   '''cache_keys = get_cached_businesses()
   for key in cache_keys:
     business = rd.get(key)
