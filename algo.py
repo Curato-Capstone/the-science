@@ -98,6 +98,7 @@ def get_cached_businesses():
   global TEMP_CACHE
   if TEMP_CACHE is None:
     TEMP_CACHE = rd.keys()
+    return TEMP_CACHE
   else:
     return TEMP_CACHE
 
