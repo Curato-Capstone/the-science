@@ -206,18 +206,20 @@ def filter_suggestions(main_user, suggestions, query):
 
   if query != "":
     parent_name = find_preference_on_search(query)
-    final_filter = set()
-    for item in filtered:
-      buss = find_business_by_id(item)
-      for val in TAXONOMY[parent_name]:
-        keep = val in buss['name'].lower()
-        for category in buss['categories']:
-          keep = keep or val in category['name']
-        if 'tags' in buss.keys():
-          keep = keep or any(val in tag for tag in buss['tags'])
-        if keep:
-          final_filter.add(item)
-    filtered = final_filter
+
+    if parent_name is not None:
+      final_filter = set()
+      for item in filtered:
+        buss = find_business_by_id(item)
+        for val in TAXONOMY[parent_name]:
+          keep = val in buss['name'].lower()
+          for category in buss['categories']:
+            keep = keep or val in category['name']
+          if 'tags' in buss.keys():
+            keep = keep or any(val in tag for tag in buss['tags'])
+          if keep:
+            final_filter.add(item)
+      filtered = final_filter
 
   return filtered
 
@@ -226,7 +228,7 @@ def find_preference_on_search(query):
   for item in TAXONOMY:
     if query in TAXONOMY[item]:
       return item
-  return "not found"
+  return None
 # Get a user's preferences that are equal to or higher than a five
 def get_good_prefs(user):
   good_prefs = set()
