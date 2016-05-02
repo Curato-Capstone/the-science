@@ -50,6 +50,7 @@ def get_all_users():
 
 # Find a business by it's business id and return it
 def find_business_by_id(bid):
+  time_1 = time.time()
   cache_keys = get_cached_businesses()
   for key in cache_keys:
     business = rd.get(key)
@@ -57,6 +58,7 @@ def find_business_by_id(bid):
 
     if business['id'] == bid:
       return business
+  print "Time taken to find a business:" + str(round(time.time() - time_1, 2)) + " seconds"
   return find_venue_by_foursquare(bid)
 
 # Find and cache a venue by it's venue id
@@ -121,17 +123,14 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
   query_set = set()
 
   # Store all items favorited by neighbors
-  time_1 = time.time()
   for neighbor in neighbors:
     user = find_user_by_id(neighbor[0])
     for item in user['favorites']:
       if item not in main_user['dislikes']:
         temp_set.add(item)
-  print "Time taken to neighbors: " + str(round(time.time() - time_1, 2)) + " seconds"
 
   # For all items, get business info and add to the final set of businesses if it:
   # has the query term in the tags or the name, else just add it anyways.
-  time_1 = time.time()
   if query:
     for suggestion in temp_set:
       bus = find_business_by_id(suggestion)
@@ -139,18 +138,15 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
         if not any(query in tag for tag in bus['tags']):
           continue
         elif query in bus['name'].lower():
-          print "yay"
           final_set.add(suggestion)
   else:
     final_set = temp_set
-  print "Time taken to query filter: " + str(round(time.time() - time_1, 2)) + " seconds"
 
   # Initial filter of suggestions based on user preferences
   final_set = filter_suggestions(main_user, final_set, query)
 
   if query:
     query_set.update(final_set)
-  time_1 = time.time()
   # If there aren't enough suggestions, update with all the cached businesses.
   # If there still aren't enough, update it with an API call.
   if len(final_set) < num_sugg:
@@ -159,7 +155,6 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
     if len(final_set) < num_sugg:
       more_results = get_suggestions_by_preferences(main_user)
       final_set.update(more_results)
-  print "Time taken to populate cached businesses: " + str(round(time.time() - time_1, 2)) + " seconds"
 
   diff = num_sugg - len(query_set)
   # Update the query set with the cached businesses, or updated it again with an API call
@@ -171,7 +166,6 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
       query_set.add(item)
 
     query_set.update(filter_suggestions(main_user, get_cached_businesses(), query))
-    print "Time taken to filter by query: " + str(round(time.time() - time_1, 2)) + " seconds"
     return random.sample(query_set, num_sugg if num_sugg - len(query_set) <= 0 else len(query_set))
   elif query:
     return random.sample(query_set, num_sugg)
@@ -180,6 +174,7 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
 
 # Filters suggestions by a user's preferences and returns it
 def filter_suggestions(main_user, suggestions, query):
+  time_1 = time.time()
   good_prefs = get_good_prefs(main_user)
   filtered = set()
 
@@ -240,7 +235,7 @@ def filter_suggestions(main_user, suggestions, query):
           if keep:
             final_filter.add(item)
       filtered = final_filter
-
+  print "Time taken to filter" + str(round(time.time() - time_1, 2)) + " seconds"
   return filtered
 
 
