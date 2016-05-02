@@ -52,14 +52,15 @@ def get_all_users():
 # Find a business by it's business id and return it
 def find_business_by_id(bid):
   time_1 = time.time()
-  cache_keys = get_cached_businesses()
+  return rd.get(bid)
+  '''cache_keys = get_cached_businesses()
   for key in cache_keys:
     business = rd.get(key)
     business = json.loads(business)
     if business['id'] == bid:
       print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"
       return business
-  print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"
+  print "Time taken to find a business: " + str(round(time.time() - time_1, 2)) + " seconds"'''
 
   return find_venue_by_foursquare(bid)
 
