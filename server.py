@@ -40,7 +40,7 @@ def main_route():
 
 @app.route('/business-info', methods=["POST"])
 def business_route():
-  businesses = flask.json.loads(request.form['favorites'])
+  businesses = flask.json.loads(request.data)['favorites']
 
   details = []
   for business in businesses:
