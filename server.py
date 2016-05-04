@@ -25,7 +25,7 @@ def suggestion_route():
       sugg = algo.get_suggestions(user_id, num_places, 3, query)
 
     else:
-      prefs = flask.json.loads(request.data)['preferences']
+      prefs = flask.json.loads(request.data)
       if len(prefs) == 0:
         return flask.abort(400)
       sugg = algo.get_new_user_suggestions(prefs, 10, 3, "")
