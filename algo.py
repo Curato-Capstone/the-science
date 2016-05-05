@@ -7,14 +7,14 @@ import random
 
 # Basic test taxonomy to help remove items from suggestions
 TAXONOMY = {
-  "outdoors": ["park"],
+  "outdoors": ["park", "hike", "trail"],
   "culture": ["art", "museum", "history", "landmark", "dance", "gallery"],
-  "sports": [],
+  "sports": ["field", "park", "skatepark"],
   "price": [],
   "food": ["restaurant", "food", "breakfast", "lunch", "dinner"],
-  "entertainment": [],
-  "relaxation": [],
-  "shopping": []
+  "entertainment": ["movie", "movies", "music", "theatre", "theater", "concert", "venue"],
+  "relaxation": ["beach", "park", "spa", "nail salon", "salon"],
+  "shopping": ["mall", "outlet", "outlets", "shopping", "shopping center", "centre", "outlet mall"]
 }
 
 FOURSQUARE_CLIENT = ""
