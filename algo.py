@@ -264,8 +264,8 @@ def get_suggestions_by_preferences(user):
     venues = json.load(urllib2.urlopen(api_call))['response']['venues']
     for venue in venues:
 
-      venue_details = find_venue_by_foursquare(venue['id'])
-      all_items.append(venue_details)
+      venue['image'] = get_venue_image(venue['id'])
+      all_items.append(venue)
 
   for item in all_items:
     all_ids.append(item['id'])
@@ -281,8 +281,8 @@ def get_suggestions_by_query(query):
   api_call = url + query
   venues = json.load(urllib2.urlopen(api_call))['response']['venues']
   for venue in venues:
-    venue_details = find_venue_by_foursquare(venue['id'])
-    all_items.append(venue_details)
+    venue['image'] = get_venue_image(venue['id'])
+    all_items.append(venue)
   for item in all_items:
     rd.set(item['id'], json.dumps(item))
     all_ids.append(item['id'])
