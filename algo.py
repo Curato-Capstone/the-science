@@ -259,7 +259,7 @@ def get_suggestions_by_preferences(user):
     api_call = url + pref
     venues = json.load(urllib2.urlopen(api_call))['response']['venues']
     for venue in venues:
-      image_url = "https://api.foursquare.com/v2/venues/" + venue['id'] + "/photos?client_id=" + \
+      '''image_url = "https://api.foursquare.com/v2/venues/" + venue['id'] + "/photos?client_id=" + \
                   FOURSQUARE_CLIENT['CLIENT_ID'] + "&client_secret=" + FOURSQUARE_CLIENT['CLIENT_SECRET'] + "&v=20130815"
       venue_json = urllib2.urlopen(image_url)
 
@@ -273,11 +273,12 @@ def get_suggestions_by_preferences(user):
           venue['image'] = image
       else:
         image = "http://imgur.com/laeYgMM.jpg"
-        venue['image'] = image
+        venue['image'] = image'''
 
-      all_items.append(venue)
+      venue_details = find_venue_by_foursquare(venue['id'])
+
+      all_items.append(venue_details)
   for item in all_items:
-    rd.set(item['id'], json.dumps(item))
     all_ids.append(item['id'])
   return set(all_ids)
 
