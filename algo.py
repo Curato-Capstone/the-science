@@ -21,7 +21,7 @@ FOURSQUARE_CLIENT = ""
 RETHINK_HOST = ""
 REDIS_HOST = ""
 KEEP_ATTRS = ['id', 'name', 'contact', 'location', 'categories', 'url', 'hours', 'rating', 'description', 'tags',
-              'imate', 'stats']
+              'image', 'stats']
 
 with open("secret/foursquare.json") as json_file:
   FOURSQUARE_CLIENT = json.load(json_file)
