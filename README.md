@@ -71,16 +71,41 @@ Function:
 
 Get suggestions in the absense of a user ID
 
-Request body:
-```yaml
-  {
-    preferences: (PROPERLY FORMATTED JSON OBJECT) user preferences
-  }
+Request body (JSON):
+```json
+{
+  "price": 1,
+  "culture": 1,
+  "food": 1,
+  "outdoors": 5,
+  "entertainment": 1,
+  "relaxation": 1,
+  "shopping": 1,
+  "sports": 1
+}
 ```
 
 Response body:
 
 Same as above.
 
+
+
+**_POST /business-info_**
+
+Function:
+
+Get business info for specific businesses
+
+Request body (JSON):
+```json
+{
+  favorites ([String]): list of venue ids
+}
+```
+
+Response body:
+
+Same as above.
 
 Thanks Foursquare, we love your API dawg
