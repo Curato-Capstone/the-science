@@ -98,7 +98,7 @@ Function:
 Get business info for specific businesses
 
 Request body (JSON):
-```json
+```yaml
 {
   favorites ([String]): list of venue ids
 }
