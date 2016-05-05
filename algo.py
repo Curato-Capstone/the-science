@@ -54,6 +54,23 @@ def find_business_by_id(bid):
   else:
     return find_venue_by_foursquare(bid)
 
+def get_venue_image(venue_id):
+  image_url = "https://api.foursquare.com/v2/venues/" + venue_id + "/photos?client_id=" + FOURSQUARE_CLIENT['CLIENT_ID'] \
+              + "&client_secret=" + FOURSQUARE_CLIENT['CLIENT_SECRET'] + "&v=20130815"
+  venue_json = urllib2.urlopen(image_url)
+
+  venue_images = json.load(venue_json)['response']['photos']
+  image = ""
+  if 'items' in venue_images.keys():
+    if len(venue_images['items']) > 0:
+      image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
+    else:
+      image = "http://imgur.com/laeYgMM.jpg"
+
+  else:
+    image = "http://imgur.com/laeYgMM.jpg"
+  return image
+
 # Find and cache a venue by it's venue id
 def find_venue_by_foursquare(venue_id):
   venue = "https://api.foursquare.com/v2/venues/" + \
@@ -61,21 +78,7 @@ def find_venue_by_foursquare(venue_id):
           "&client_secret=" + FOURSQUARE_CLIENT['CLIENT_SECRET'] + "&v=20130815"
   venue_details = json.load(urllib2.urlopen(venue))['response']['venue']
 
-  image_url = "https://api.foursquare.com/v2/venues/" + venue_id + "/photos?client_id=" + FOURSQUARE_CLIENT['CLIENT_ID'] \
-              + "&client_secret=" + FOURSQUARE_CLIENT['CLIENT_SECRET'] + "&v=20130815"
-  venue_json = urllib2.urlopen(image_url)
-
-  venue_images = json.load(venue_json)['response']['photos']
-  if 'items' in venue_images.keys():
-    if len(venue_images['items']) > 0:
-      image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
-      venue_details['image'] = image
-    else:
-      image = "http://imgur.com/laeYgMM.jpg"
-      venue_details['image'] = image
-  else:
-    image = "http://imgur.com/laeYgMM.jpg"
-    venue_details['image'] = image
+  venue_details['image'] = get_venue_image(venue_id)
 
   for detail in venue_details.keys():
     if detail not in KEEP_ATTRS:
@@ -153,12 +156,13 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
   diff = num_sugg - len(query_set)
   # Update the query set with the cached businesses, or updated it again with an API call
   if query and diff > 0:
-    query_result = get_suggestions_by_query(query)
-    new_suggs = random.sample(query_result, diff if diff < len(query_result) else len(query_result))
-    for item in new_suggs:
-      query_set.add(item)
-
     query_set.update(filter_suggestions(main_user, get_cached_businesses(), query))
+
+    if num_sugg - len(query_set) > 0:
+      query_result = get_suggestions_by_query(query)
+      new_suggs = random.sample(query_result, diff if diff < len(query_result) else len(query_result))
+      for item in new_suggs:
+        query_set.add(item)
     return random.sample(query_set, num_sugg if num_sugg - len(query_set) <= 0 else len(query_set))
   elif query:
     return random.sample(query_set, num_sugg)
@@ -259,25 +263,10 @@ def get_suggestions_by_preferences(user):
     api_call = url + pref
     venues = json.load(urllib2.urlopen(api_call))['response']['venues']
     for venue in venues:
-      '''image_url = "https://api.foursquare.com/v2/venues/" + venue['id'] + "/photos?client_id=" + \
-                  FOURSQUARE_CLIENT['CLIENT_ID'] + "&client_secret=" + FOURSQUARE_CLIENT['CLIENT_SECRET'] + "&v=20130815"
-      venue_json = urllib2.urlopen(image_url)
-
-      venue_images = json.load(venue_json)['response']['photos']
-      if 'items' in venue_images.keys():
-        if len(venue_images['items']) > 0:
-          image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
-          venue['image'] = image
-        else:
-          image = "http://imgur.com/laeYgMM.jpg"
-          venue['image'] = image
-      else:
-        image = "http://imgur.com/laeYgMM.jpg"
-        venue['image'] = image'''
 
       venue_details = find_venue_by_foursquare(venue['id'])
-
       all_items.append(venue_details)
+
   for item in all_items:
     all_ids.append(item['id'])
   return set(all_ids)
