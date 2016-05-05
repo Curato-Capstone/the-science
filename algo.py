@@ -8,7 +8,7 @@ import random
 # Basic test taxonomy to help remove items from suggestions
 TAXONOMY = {
   "outdoors": ["park"],
-  "culture": ["art", "museum", "history", "landmark"],
+  "culture": ["art", "museum", "history", "landmark", "dance", "gallery"],
   "sports": [],
   "price": [],
   "food": ["restaurant", "food", "breakfast", "lunch", "dinner"],
@@ -49,6 +49,7 @@ def get_all_users():
 # Find a business by it's business id and return it
 def find_business_by_id(bid):
   item = rd.get(bid)
+  
   if item is not None:
     return json.loads(item)
   else:
@@ -83,7 +84,7 @@ def find_venue_by_foursquare(venue_id):
   for detail in venue_details.keys():
     if detail not in KEEP_ATTRS:
       del venue_details[detail]
-
+  
   rd.set(venue_details['id'], json.dumps(venue_details))
   return venue_details
 
@@ -132,7 +133,7 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
     for suggestion in temp_set:
       bus = find_business_by_id(suggestion)
       if 'tags' in bus.keys():
-        if not any(query in tag for tag in bus['tags']):
+        if not any(query in tag.lower() for tag in bus['tags']):
           continue
         elif query in bus['name'].lower():
           final_set.add(suggestion)
@@ -144,11 +145,12 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
 
   if query:
     query_set.update(final_set)
+  
   # If there aren't enough suggestions, update with all the cached businesses.
   # If there still aren't enough, update it with an API call.
-  if len(final_set) < num_sugg:
+  if len(final_set) < num_sugg and not query:
     final_set.update(filter_suggestions(main_user, get_cached_businesses(), query))
-
+    
     if len(final_set) < num_sugg:
       more_results = get_suggestions_by_preferences(main_user)
       final_set.update(more_results)
@@ -157,7 +159,7 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
   # Update the query set with the cached businesses, or updated it again with an API call
   if query and diff > 0:
     query_set.update(filter_suggestions(main_user, get_cached_businesses(), query))
-
+    
     if num_sugg - len(query_set) > 0:
       query_result = get_suggestions_by_query(query)
       new_suggs = random.sample(query_result, diff if diff < len(query_result) else len(query_result))
@@ -173,35 +175,39 @@ def choose_suggestions(main_user, neighbors, num_sugg, query=""):
 def filter_suggestions(main_user, suggestions, query):
   good_prefs = get_good_prefs(main_user)
   filtered = set()
-
+  
   # For the cold start, if no other users exist and have no suggestions, choose
   # places that people might like based off taxonomy
   for suggestion in suggestions:
     buss = find_business_by_id(suggestion)
     if buss['id'] not in main_user['dislikes']:
       # Filter out suggestions if they are something that the user isn't interested in
-
+      
       if 'tags' in buss.keys():
         tags = buss['tags']
-        if query and any(query in tag for tag in tags):
+        if query and any(query in tag.lower() for tag in tags):	  
           filtered.add(suggestion)
         else:
           for pref in good_prefs:
             for word in TAXONOMY[pref]:
-              if any(word in tag for tag in tags):
+              if any(word in tag.lower() for tag in tags):
                 filtered.add(suggestion)
+      if query and query in buss['name'].lower():
+        filtered.add(suggestion)
+      elif query and any(query in cat['name'].lower() for cat in buss['categories']):
+        filtered.add(suggestion)
       else:
-        if query and query in buss['name'].lower():
-          filtered.add(suggestion)
-        elif query and any(query in cat['name'] for cat in buss['categories']):
-          filtered.add(suggestion)
-        else:
-          for pref in good_prefs:
-            for word in TAXONOMY[pref]:
-              if any(word in cat['name'] for cat in buss['categories']):
-                filtered.add(suggestion)
-              elif word in buss['name'].lower():
-                filtered.add(suggestion)
+        for pref in good_prefs:
+	  if any(pref in cat['name'].lower() for cat in buss['categories']):
+	    filtered.add(suggestion)
+	  if pref in buss['name'].lower():
+	    filtered.add(suggestion) 
+       
+          for word in TAXONOMY[pref]:
+            if any(word in cat['name'].lower() for cat in buss['categories']):
+              filtered.add(suggestion)
+            elif word in buss['name'].lower():
+              filtered.add(suggestion)
 
   if query != "":
     parent_name = find_preference_on_search(query)
@@ -214,9 +220,9 @@ def filter_suggestions(main_user, suggestions, query):
         for val in TAXONOMY[parent_name]:
           keep = val in buss['name'].lower()
           for category in buss['categories']:
-            keep = keep or val in category['name']
+            keep = keep or val in category['name'].lower()
           if 'tags' in buss.keys():
-            keep = keep or any(val in tag for tag in buss['tags'])
+            keep = keep or any(val in tag.lower() for tag in buss['tags'])
           if keep:
             final_filter.add(item)
       filtered = final_filter
@@ -225,9 +231,9 @@ def filter_suggestions(main_user, suggestions, query):
         buss = find_business_by_id(item)
         keep = query in buss['name'].lower()
         for category in buss['categories']:
-          keep = keep or query in category['name']
+          keep = keep or query in category['name'].lower()
           if 'tags' in buss.keys():
-            keep = keep or any(query in tag for tag in buss['tags'])
+            keep = keep or any(query in tag.lower() for tag in buss['tags'])
           if keep:
             final_filter.add(item)
       filtered = final_filter
