@@ -25,10 +25,13 @@ def suggestion_route():
       sugg = algo.get_suggestions(user_id, num_places, 3, query)
 
     else:
-      prefs = flask.json.loads(request.data)
+      # change to take a query param
+      req = flask.json.loads(request.data)
+      prefs = req['preferences']
+      q = req['q']
       if len(prefs) == 0:
         return flask.abort(400)
-      sugg = algo.get_new_user_suggestions(prefs, 10, 3, "")
+      sugg = algo.get_new_user_suggestions(prefs, 10, 3, q)
 
     resp = Response(flask.json.dumps(sugg),  mimetype='application/json')
     resp.headers["Access-Control-Allow-Origin"] = '*'
