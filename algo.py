@@ -69,10 +69,10 @@ def get_venue_image(venue_id):
     if len(venue_images['items']) > 0:
       image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
     else:
-      image = "http://imgur.com/laeYgMM.jpg"
+      image = "/client/images/logo/logo.svg"
 
   else:
-    image = "http://imgur.com/laeYgMM.jpg"
+    image = "/client/images/logo/logo.svg"
   return image
 
 # Find and cache a venue by it's venue id
