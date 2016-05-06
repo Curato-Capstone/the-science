@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import math
 import redis
 import rethinkdb as r
@@ -22,6 +24,7 @@ RETHINK_HOST = ""
 REDIS_HOST = ""
 KEEP_ATTRS = ['id', 'name', 'contact', 'location', 'categories', 'url', 'hours', 'rating', 'description', 'tags',
               'image', 'stats']
+DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 with open("secret/foursquare.json") as json_file:
   FOURSQUARE_CLIENT = json.load(json_file)
@@ -84,10 +87,44 @@ def find_venue_by_foursquare(venue_id):
   for detail in venue_details.keys():
     if detail not in KEEP_ATTRS:
       del venue_details[detail]
+    if detail == 'hours':
+      venue_details[detail] = format_hours(venue_details[detail])
+
   
   rd.set(venue_details['id'], json.dumps(venue_details))
   return venue_details
 
+def format_hours(hours_json):
+  hours = hours_json['timeframes']
+  formatted_hours = {}
+
+  for item in hours:
+    open_hours = item['open'][0]['renderedTime']
+    num_bundles = item['days'].split(',')
+    num_bundles = [item.strip() for item in num_bundles]
+
+    for bundle in num_bundles:
+      result = bundle.encode('utf-8').split('–')
+
+      if len(result) > 1:
+        start = DAYS.index(result[0])
+        end = DAYS.index(result[1]) + 1
+
+        if start == 7:
+          start = 0
+          formatted_hours['Sun'] = open_hours
+
+        for i in range(start, end, 1):
+          formatted_hours[DAYS[i]] = open_hours
+      else:
+        formatted_hours[DAYS[DAYS.index(result[0])]] = open_hours
+
+  if len(formatted_hours.keys()) < 7:
+    for day in DAYS:
+      if day not in formatted_hours.keys():
+        formatted_hours[day] = 'Closed'
+
+  return formatted_hours
 # Grab all keys for cached businesses
 def get_cached_businesses():
   return rd.keys()
