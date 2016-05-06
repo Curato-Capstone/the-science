@@ -34,6 +34,10 @@ def suggestion_route():
     resp.headers["Access-Control-Allow-Origin"] = '*'
     return resp
 
+@app.route('/place/<venue_id>')
+def place_info(venue_id):
+  return algo.find_business_by_id(venue_id)
+
 @app.route('/')
 def main_route():
   return "You aren't supposed to be here."
