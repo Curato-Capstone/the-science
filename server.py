@@ -36,7 +36,11 @@ def suggestion_route():
 
 @app.route('/place/<venue_id>')
 def place_info(venue_id):
-  return algo.find_business_by_id(venue_id)
+  sugg = algo.find_business_by_id(venue_id)
+
+  resp = Response(flask.json.dumps(sugg), mimetype='application/json')
+  resp.headers["Access-Control-Allow-Origin"] = '*'
+  return resp
 
 @app.route('/')
 def main_route():
