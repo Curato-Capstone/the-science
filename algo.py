@@ -186,7 +186,8 @@ def get_new_user_suggestions(preferences, num_sugg, k_num, query):
   user = {
     'id': -1,
     'preferences': preferences,
-    'dislikes': []
+    'dislikes': [],
+    'favorites': []
   }
   neighbors = k_nearest_neighbors(user, k_num)
   suggestions = choose_suggestions(user, neighbors, num_sugg, query)
