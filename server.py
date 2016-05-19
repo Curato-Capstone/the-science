@@ -29,9 +29,10 @@ def suggestion_route():
       req = flask.json.loads(request.data)
       prefs = req['preferences']
       q = req['q']
+      num_suggs = req['num_suggs']
       if len(prefs) == 0:
         return flask.abort(400)
-      sugg = algo.get_new_user_suggestions(prefs, 10, 3, q)
+      sugg = algo.get_new_user_suggestions(prefs, num_suggs, 3, q)
 
     resp = Response(flask.json.dumps(sugg),  mimetype='application/json')
     resp.headers["Access-Control-Allow-Origin"] = '*'
