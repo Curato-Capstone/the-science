@@ -28,8 +28,16 @@ def suggestion_route():
       # change to take a query param
       req = flask.json.loads(request.data)
       prefs = req['preferences']
-      q = req['q']
-      num_sugg = req['num_sugg']
+      if 'q' in req.keys():
+        q = req['q']
+      else:
+        q = ""
+
+      if 'num_sugg' in req.keys():
+        num_sugg = req['num_sugg']
+      else:
+        num_sugg = 3
+        
       if len(prefs) == 0:
         return flask.abort(400)
       sugg = algo.get_new_user_suggestions(prefs, num_sugg, 3, q)
