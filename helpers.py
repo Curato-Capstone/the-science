@@ -54,10 +54,10 @@ def get_venue_image(venue_id):
     if len(venue_images['items']) > 0:
       image = venue_images['items'][0]['prefix'] + "original" + venue_images['items'][0]['suffix']
     else:
-      image = "http://i.imgur.com/9YErqna.jpg"
+      image = "http://i.imgur.com/JGq91FT.jpg"
 
   else:
-    image = "http://i.imgur.com/9YErqna.jpg"
+    image = "http://i.imgur.com/JGq91FT.jpg"
   return image
 
 # Find and cache a venue by it's venue id
@@ -84,7 +84,7 @@ def format_hours(hours_json):
   formatted_hours = {}
 
   for item in hours:
-    open_hours = item['open'][0]['renderedTime']
+    open_hours = item['open'][0]['renderedTime'].encode('utf-8').split('–').join(' - ')
     num_bundles = item['days'].split(',')
     num_bundles = [item.strip() for item in num_bundles]
 
