@@ -36,10 +36,11 @@ def suggestion_route():
       if 'num_sugg' in req.keys():
         num_sugg = req['num_sugg']
       else:
-        num_sugg = 3
-
+        num_sugg = 10
+        
       if len(prefs) == 0:
         return flask.abort(400)
+      
       sugg = algo.get_new_user_suggestions(prefs, num_sugg, 3, q)
 
     resp = Response(flask.json.dumps(sugg),  mimetype='application/json')
