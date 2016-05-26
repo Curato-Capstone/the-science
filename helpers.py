@@ -84,7 +84,7 @@ def format_hours(hours_json):
   formatted_hours = {}
 
   for item in hours:
-    open_hours = item['open'][0]['renderedTime'].encode('utf-8').split('–').join(' - ')
+    open_hours = item['open'][0]['renderedTime']
     num_bundles = item['days'].split(',')
     num_bundles = [item.strip() for item in num_bundles]
 
